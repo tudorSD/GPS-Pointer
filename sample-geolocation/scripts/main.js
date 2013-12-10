@@ -5,7 +5,8 @@ function id(element) {
 document.addEventListener("deviceready", onDeviceReady, false);
  
 function onDeviceReady() {
-	geolocationApp = new geolocationApp();
+	navigator.splashscreen.hide();
+    geolocationApp = new geolocationApp();
 	geolocationApp.run();
     
 }
