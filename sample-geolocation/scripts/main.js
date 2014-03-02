@@ -11,8 +11,8 @@ function onDeviceReady() {
 	navigator.splashscreen.hide();
     geolocationApp = new geolocationApp();
 	geolocationApp.run();
- //   compassHelper = new CompassHelper();
-//	compassHelper.run();
+    compassHelper = new CompassHelper();
+	compassHelper.run();
     
 }
 
@@ -28,17 +28,16 @@ var compassHeading = null;
 
 function geolocationApp() {
 }
-//function CompassHelper() {
-//}
+function CompassHelper() {
+}
 
 function initializeMap() {
 
 	map = new L.Map('map');
 
-    var osmUrl = 'http://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
-    var osmAttrib = 'Map data © OpenStreetMap contributors';
+    var stamenUrl = 'http://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
     var stamenAttrib = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.';
-    var osm = new L.TileLayer(osmUrl, { 
+    var osm = new L.TileLayer(stamenUrl, { 
         								attribution: stamenAttrib,
         								detectRetina: true
                                       });
@@ -49,19 +48,18 @@ function initializeMap() {
     pushpin = L.marker([32.721216, -117.16896]).addTo(map);
 }
 
-function recenterOnPhonePositionLeaflet(latitude, longitude) { 
+function recenterOnPhonePosition(latitude, longitude) { 
     var currentLocation = new L.LatLng(latitude, longitude); 
   
     pushpin.setLatLng(currentLocation); 
     map.setView(currentLocation); 
 } 
 
-/*CompassHelper.prototype = {
-	//watchID : null,
-    
+CompassHelper.prototype = {
 	run: function() {
-		var that = this,
-		refreshButton = document.getElementById("refreshCompButton"),
+		var that = this;
+        
+		var refreshButton = document.getElementById("refreshCompButton");
 		
 		refreshButton.addEventListener("click", 
 									   function() {
@@ -98,7 +96,7 @@ function recenterOnPhonePositionLeaflet(latitude, longitude) {
 		var result = document.getElementById("compresult");
 		result.innerText = "";
 	}
-}*/
+}
 
 geolocationApp.prototype = {
 	_watchID:null,
@@ -125,7 +123,7 @@ geolocationApp.prototype = {
 	_onSuccess:function(position) {
 		// Successfully retrieved the geolocation information. Display it all.
         
-       // recenterOnPhonePositionLeaflet(position.coords.latitude, position.coords.longitude);
+        recenterOnPhonePosition(position.coords.latitude, position.coords.longitude);
         
 		this._setNavResults('Latitude: ' + position.coords.latitude + '<br />' +
 						 'Longitude: ' + position.coords.longitude + '<br />' +
