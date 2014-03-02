@@ -16,7 +16,7 @@
     <AndroidVersionCode>1</AndroidVersionCode>
     <AndroidHardwareAcceleration>false</AndroidHardwareAcceleration>
     <FrameworkVersion>3.2.0</FrameworkVersion>
-    <CorePlugins>org.apache.cordova.geolocation;org.apache.cordova.splashscreen</CorePlugins>
+    <CorePlugins>org.apache.cordova.device-motion;org.apache.cordova.device-orientation;org.apache.cordova.geolocation;org.apache.cordova.splashscreen</CorePlugins>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Telerik\ICE\Tools\Mobile\MobileTools.targets" />
 </Project>

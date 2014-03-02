@@ -9,25 +9,37 @@
 		<link rel="stylesheet" href="styles/main.css" />
 		<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
 		<script type="text/javascript" charset="utf-8" src="scripts/main.js"></script>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+        <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.2.4"></script>
+        
+        <style type="text/css">
+            html, body, #map
+            {
+                height: 100%;
+            }
+            #map
+            {
+                width: 100%;
+            }
+        </style>
+        
 	</head>
 	<body>
 		<header class="header">
 			<h1>Geolocation Sample</h1>
 		</header>
 		<div class="content">
-            <div class="action-area ch30">
+            <div class="action-area ch20">
                 <button class="button dh" id="watchButton">Start Geolocation Watch</button>
 			    <button class="button dh" id="refreshButton">Refresh Geolocation</button>
             </div>
-			<div class="result-area ch70">
+			<div class="result-area ch80">
+                <div id="map"></div>
                 <div class="results">
                     <div id="results" class="desc"></div>
                 </div>
-                <div class="separator"></div>
             </div>
 		</div>
 	</body>
-	<footer class="footer">
-		<div>Cordova API Samples</div>
-	</footer>
 </html>
