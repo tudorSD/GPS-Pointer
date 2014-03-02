@@ -4,8 +4,10 @@ function id(element) {
  
 document.addEventListener("deviceready", onDeviceReady, false); 
 document.addEventListener('deviceready', initializeMap, false);
+document.addEventListener("touchstart", function() {}, false);
 
-//var compassHeltper;
+var compassHelper;
+var accelerometerHelper;
 
 function onDeviceReady() {
 	navigator.splashscreen.hide();
@@ -13,6 +15,8 @@ function onDeviceReady() {
 	geolocationApp.run();
     compassHelper = new CompassHelper();
 	compassHelper.run();
+    accelerometerHelper = new AccelerometerApp();
+	accelerometerHelper.run();
     
 }
 
@@ -29,6 +33,8 @@ var compassHeading = null;
 function geolocationApp() {
 }
 function CompassHelper() {
+}
+function AccelerometerApp() {
 }
 
 function initializeMap() {
@@ -142,5 +148,51 @@ geolocationApp.prototype = {
 		else {
 			document.getElementById("navresults").innerHTML = value;
 		}
+	}
+}
+
+AccelerometerApp.prototype = {
+	watchID : null,
+	spanX : null,
+	spanY: null,
+	spanZ: null,
+	spanTimeStamp: null,
+    
+	run:function() {
+		var that = this;
+		document.getElementById("refreshAccButton").addEventListener("click", function() {
+			that._handleRefresh.apply(that, arguments);
+		}, false);
+	},
+    
+	_handleRefresh:function() {
+		var that = this;
+		navigator.accelerometer.getCurrentAcceleration(function() { 
+			that._displayAcceleration.apply(that, arguments)
+		});
+	},    
+ 
+    _displayAcceleration: function(acceleration) {
+		var that = this;
+		x_acceleration = acceleration.x;
+		y_acceleration = acceleration.y;
+        z_acceleration = acceleration.z;
+        
+		var informationMessage = 'X: ' + x_acceleration.toFixed(2) +
+								 ' Y: ' + y_acceleration.toFixed(2) +
+								 ' Z: ' + z_acceleration.toFixed(2); 
+        
+		that._clearCurrentNotification();
+		that._writeNotification(informationMessage);
+	},
+    
+    _writeNotification: function(text) {
+		var result = document.getElementById("accresult");
+		result.innerHTML = text;
+	},
+    
+	_clearCurrentNotification: function() {
+		var result = document.getElementById("accresult");
+		result.innerText = "";
 	}
 }
