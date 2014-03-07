@@ -14,7 +14,7 @@ body
 	margin: 0;
 	padding: 0;
     height:100%;
-    padding: 60px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
     overflow:hidden;
 }
 
@@ -232,7 +232,7 @@ body
 	border: 1px solid rgba(255, 255, 255, 0.5);
 }
 .button.dh {
-    height:60px;   
+    height:40px;   
 }
 .button.dw {
     width:220px;   
@@ -251,4 +251,29 @@ body
     font-size:16px;
     color:#639ecd;
     word-wrap:break-word;
+}
+
+#resultscointainer{
+    width: 100%;
+    font-size: 12px;
+    overflow: hidden; /* contain floated elements */
+    background: #ccc
+}
+#resultsleft {
+    float: left; 
+    width: 33%;
+    height: 10%;
+    background-color: #0f0;
+}
+#resultscenter { 
+    float: left;
+    background-color: #ff0;
+    height :10%;
+    width: 33%;
+}
+#resultsright{
+    float: left;
+    width: 34%;
+    height: 10%;
+    background-color: #f00;
 }
