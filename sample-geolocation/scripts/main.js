@@ -22,22 +22,44 @@ function onDeviceReady() {
 
 function initializeMap() {
 
-	map = new L.Map('map');
-
-    map.on('click', update_all_sensors);
-    map.on('dblclick', function(e) { alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng) });
+	checkConnection();
     
     var stamenUrl = 'http://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
     var stamenAttrib = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.';
-    var osm = new L.TileLayer(stamenUrl, { 
+    var stamen = new L.TileLayer(stamenUrl, { 
         								attribution: stamenAttrib,
-        								detectRetina: true,
-        								fadeAnimation: true,
-        								doubleClickZoom: false
+        								detectRetina: true
                                       });
 
+    var googleStreets = new L.Google('ROADMAP');
+    var googleTerrain = new L.Google('TERRAIN');
+    var googleSatellite = new L.Google('SATELLITE');
+    
+    // map.addLayer(googleLayer);	
+    // map.addLayer(stamen);
+    
+    map = new L.Map('map',{
+        layers: [stamen, googleStreets, googleTerrain, googleSatellite],
+        fadeAnimation: true,
+       // zoomAnimation: false,
+        zoomControl: false   
+    });
+
+    var baseMaps = {
+        "Stamen": stamen,
+        "Streets": googleStreets,
+        "Terrain": googleTerrain,
+        "Satellite": googleSatellite
+	};
+    L.control.layers(baseMaps).addTo(map);
+    
+    map.on('contextmenu', function(e) {
+		get_elevation(e.latlng)
+    });
+    
+    map.on('click', update_all_sensors);
+    
     map.setView(new L.LatLng(32.721216,-117.16896), 11);
-    map.addLayer(osm);
   
      //https://github.com/lvoogdt/Leaflet.awesome-markers
     target_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'camera',  prefix: 'fa',markerColor: 'red'}) }).addTo(map);
@@ -46,6 +68,22 @@ function initializeMap() {
   //  writeMessage("tester");
 }
 
+function checkConnection() {
+    var networkState = navigator.network.connection.type;
+
+    var states = {};
+    states[Connection.UNKNOWN]  = 'Unknown connection';
+    states[Connection.ETHERNET] = 'Ethernet connection';
+    states[Connection.WIFI]     = 'WiFi connection';
+    states[Connection.CELL_2G]  = 'Cell 2G connection';
+    states[Connection.CELL_3G]  = 'Cell 3G connection';
+    states[Connection.CELL_4G]  = 'Cell 4G connection';
+    states[Connection.NONE]     = 'No network connection';
+
+    if (networkState == Connection.NONE)
+        alert("A data connection is required to load the map.");
+    //alert('Connection type: ' + states[networkState]);
+}
 
 // my stuff
 var map = null;
@@ -136,22 +174,16 @@ function navSuccess(position){
 
 function navError(){}
 
-
-var touch_timer = null;
-function start_long_touch(e){
-	touch_timer= setTimeout(function(e){
-		// Get elevation at currently touched point.
-        alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
-	},700); // ms
-}
-function stop_long_touch(){
-	clearTimeout(touch_timer);
-}
-
 function check_for_all_returns(){
+    
     if (acc_valid && nav_valid && comp_valid && elevation_valid){
        // clearMessage();
     
+		checkConnection();
+        
+        if (altitude < current_position_ground_elevation)
+            altitude = current_position_ground_elevation + 1;
+        
         // make webservice call. 
 		var url = "http://ec2-54-193-71-90.us-west-1.compute.amazonaws.com:8090/ground_intersection/" + latitude + "/" + longitude + "/" + altitude + "/0.0/" + pitch + "/" + compass_heading;																	
         update_position(url, latitude, longitude);
@@ -194,7 +226,11 @@ function update_position(url, lat, lon) {
                 sensor_pin = L.marker([lat,lon]).addTo(map);
             }
             sensor_pin.setLatLng([lat,lon]).update();
-            map.setView([lat,lon]);
+    
+          //  if(target_latitude == 0 && target_longitude == 0)
+                map.setView([lat,lon]);
+          //  else
+	      //      map.fitBounds([[lat,lon],[target_latitude,target_longitude]]);
         }
     });
 }
@@ -214,6 +250,26 @@ function update_elevation(url) {
     });
 }
 
+function get_elevation(latlng) {
+    var url = "http://ec2-54-193-71-90.us-west-1.compute.amazonaws.com:8090/elevation/" + latlng.lat + "/" + latlng.lng;
+    update_elevation(url);
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        //error:  function(jqXHR, textStatus, errorThrown) {
+        //	    alert(jqXHR.status);
+        //	},
+        success: function(dataWeGotViaJsonp){
+            current_position_ground_elevation = dataWeGotViaJsonp["elevation"];
+            navigator.notification.alert(
+                current_position_ground_elevation.toFixed(1) + " m",
+                null, // Specify a function to be called 
+                'Elevation:',
+                "OK"
+            );
+        }
+    });
+}
 
 function writeMessage(text, id) {
     var result = document.getElementById(id);
