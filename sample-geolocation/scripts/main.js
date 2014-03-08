@@ -1,7 +1,7 @@
 function id(element) {
 	return document.getElementById(element);
 }
- 
+
 document.addEventListener("deviceready", onDeviceReady, false); 
 document.addEventListener("touchstart", function() {}, false);
 
@@ -33,23 +33,54 @@ function initializeMap() {
 
     var googleStreets = new L.Google('ROADMAP');
     var googleTerrain = new L.Google('TERRAIN');
-    var googleSatellite = new L.Google('SATELLITE');
+    var googleSatellite = new L.Google('HYBRID');
+   
+   // var bingLayer = new L.BingLayer("Ap3GmA3YzgPeVI3iSZ8yZWepLOfmyR1zR89sMmDYQUUqWmbo0uZIw9kS3WhlR7gt");
+    var BingLayer = L.TileLayer.extend({
+        getTileUrl: function (tilePoint) {
+            this._adjustTilePoint(tilePoint);
+            return L.Util.template(this._url, {
+                s: this._getSubdomain(tilePoint),
+                q: this._quadKey(tilePoint.x, tilePoint.y, this._getZoomForUrl())
+            });
+        },
+        _quadKey: function (x, y, z) {
+            var quadKey = [];
+            for (var i = z; i > 0; i--) {
+                var digit = '0';
+                var mask = 1 << (i - 1);
+                if ((x & mask) != 0) {
+                    digit++;
+                }
+                if ((y & mask) != 0) {
+                    digit++;
+                    digit++;
+                }
+                quadKey.push(digit);
+            }
+            return quadKey.join('');
+        }
+    });    
     
-    // map.addLayer(googleLayer);	
-    // map.addLayer(stamen);
+    var bingLayer = new BingLayer('http://t{s}.tiles.virtualearth.net/tiles/a{q}.jpeg?g=1398', {
+        subdomains: ['0', '1', '2', '3', '4'],
+        attribution: '&copy; <a href="http://bing.com/maps">Bing Maps</a>'
+    });
     
     map = new L.Map('map',{
-        layers: [stamen, googleStreets, googleTerrain, googleSatellite],
+        //layers: [stamen, googleStreets, googleTerrain, googleSatellite],  // adds all of these at once
         fadeAnimation: true,
        // zoomAnimation: false,
         zoomControl: false   
     });
+    map.addLayer(stamen);
 
     var baseMaps = {
-        "Stamen": stamen,
+        "Default": stamen,
         "Streets": googleStreets,
         "Terrain": googleTerrain,
-        "Satellite": googleSatellite
+        "Satellite": googleSatellite,
+        "Bing": bingLayer
 	};
     L.control.layers(baseMaps).addTo(map);
     
@@ -62,8 +93,8 @@ function initializeMap() {
     map.setView(new L.LatLng(32.721216,-117.16896), 11);
   
      //https://github.com/lvoogdt/Leaflet.awesome-markers
-    target_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'camera',  prefix: 'fa',markerColor: 'red'}) }).addTo(map);
-    sensor_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'home',  prefix: 'fa',markerColor: 'green'}) }).addTo(map);
+    target_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'bullseye',  prefix: 'fa',markerColor: 'red'}) }).addTo(map);
+    sensor_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'fa-location-arrow',  prefix: 'fa',markerColor: 'green'}) }).addTo(map);
   		
   //  writeMessage("tester");
 }
@@ -204,6 +235,7 @@ function check_for_all_returns(){
 var ground_target;
 var sensor_location;
 function update_position(url, lat, lon) {
+    writeMessage("Elev: - m</br> Range: - m", "resultsright");
     $.ajax({
         url: url,
         dataType: 'json',
@@ -252,7 +284,7 @@ function update_elevation(url) {
 
 function get_elevation(latlng) {
     var url = "http://ec2-54-193-71-90.us-west-1.compute.amazonaws.com:8090/elevation/" + latlng.lat + "/" + latlng.lng;
-    update_elevation(url);
+    //update_elevation(url);
     $.ajax({
         url: url,
         dataType: 'json',
