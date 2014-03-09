@@ -70,25 +70,28 @@ function initializeMap() {
     map = new L.Map('map',{
         //layers: [stamen, googleStreets, googleTerrain, googleSatellite],  // adds all of these at once
         fadeAnimation: true,
+        doubleClickZoom: false,
        // zoomAnimation: false,
         zoomControl: false   
     });
-    map.addLayer(stamen);
+    map.addLayer(bingLayer);
 
     var baseMaps = {
-        "Default": stamen,
-        "Streets": googleStreets,
-        "Terrain": googleTerrain,
-        "Satellite": googleSatellite,
-        "Bing": bingLayer
+        "Road/Terrain": stamen,
+        //"Streets": googleStreets,
+        //"Terrain": googleTerrain,
+        //"Satellite": googleSatellite,
+        "Satellite": bingLayer
 	};
     L.control.layers(baseMaps).addTo(map);
     
     map.on('contextmenu', function(e) {
-		get_elevation(e.latlng)
+       // var marker = L.marker(e.latlng).addTo(map);
+       // marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+		get_elevation(e.latlng);
     });
     
-    map.on('click', update_all_sensors);
+    map.on('dblclick', update_all_sensors);
     
     map.setView(new L.LatLng(32.721216,-117.16896), 11);
   
@@ -293,12 +296,21 @@ function get_elevation(latlng) {
         //	},
         success: function(dataWeGotViaJsonp){
             current_position_ground_elevation = dataWeGotViaJsonp["elevation"];
-            navigator.notification.alert(
+            /*navigator.notification.alert(
                 current_position_ground_elevation.toFixed(1) + " m",
                 null, // Specify a function to be called 
                 'Elevation:',
                 "OK"
-            );
+            );*/
+          /*  var popup = L.popup()
+                .setLatLng(latlng)
+                .setContent(current_position_ground_elevation.toFixed(1) + " m")
+                .openOn(map);*/
+          	var marker = L.marker(latlng).addTo(map);
+      		marker.bindPopup(current_position_ground_elevation.toFixed(1) + " m").openPopup();
+            marker.on('contextmenu', function(e) {
+                map.removeLayer(marker);
+            });
         }
     });
 }
