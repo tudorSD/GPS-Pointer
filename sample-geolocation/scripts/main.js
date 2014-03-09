@@ -5,19 +5,26 @@ function id(element) {
 document.addEventListener("deviceready", onDeviceReady, false); 
 document.addEventListener("touchstart", function() {}, false);
 
-var compassHelper = null;
-var accelerometerHelper = null;
-var geolocationApp = null;
-
 function onDeviceReady() {
 	navigator.splashscreen.hide();
+    
+    var shake = new Shake({
+            frequency: 300,                                                //milliseconds between polls for accelerometer data.
+            waitBetweenShakes: 1000,                                       //milliseconds to wait before watching for more shake events.
+            threshold: 12,                                                 //how hard the shake has to be to register.
+            success: onShakeDetected, 										//callback when shake is detected. "this" will be the "shake" object.
+            failure: function() {},                                        //callback when watching/getting acceleration fails. "this" will be the "shake" object.
+        });    
+    
+    shake.startWatch();
+    
     initializeMap();
-    geolocationApp = new geolocationApp();
+ /*   geolocationApp = new geolocationApp();
 	geolocationApp.run();
     compassHelper = new CompassHelper();
 	compassHelper.run();
     accelerometerHelper = new AccelerometerApp();
-	accelerometerHelper.run();
+	accelerometerHelper.run();*/
 }
 
 function initializeMap() {
@@ -98,8 +105,6 @@ function initializeMap() {
      //https://github.com/lvoogdt/Leaflet.awesome-markers
     target_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'bullseye',  prefix: 'fa',markerColor: 'red'}) }).addTo(map);
     sensor_pin = L.marker([32.721216, -117.16896], {icon: L.AwesomeMarkers.icon({icon: 'fa-location-arrow',  prefix: 'fa',markerColor: 'green'}) }).addTo(map);
-  		
-  //  writeMessage("tester");
 }
 
 function checkConnection() {
@@ -135,13 +140,21 @@ var nav_valid = false;
 var comp_valid = false;
 var elevation_valid = false;
 
-function geolocationApp() {
-}
-function CompassHelper() {
-}
-function AccelerometerApp() {
-}
+var markers_array = new Array();
 
+function onShakeDetected(magnitude, accelerationDelta, timestamp) {
+	delete_all_markers();
+};
+
+function onShakeError() {
+	delete_all_markers();
+};
+
+function delete_all_markers() {
+    for(i=0;i<markers_array.length;i++) {
+        map.removeLayer(markers_array[i]);
+    }  
+}
 
 function update_all_sensors(){
     acc_valid = false;
@@ -205,7 +218,6 @@ function navSuccess(position){
     
     check_for_all_returns();
 }
-
 function navError(){}
 
 function check_for_all_returns(){
@@ -252,20 +264,32 @@ function update_position(url, lat, lon) {
             var target_range = dataWeGotViaJsonp["range"];
             writeMessage("Elev: " + target_elevation.toFixed(1) + "m</br> Range: " + target_range.toFixed(1) + "m", "resultsright");
             writeMessage("SensorAlt: " + altitude.toFixed(1) + "m</br>GroundAlt: " + current_position_ground_elevation.toFixed(1) + "m", "resultsleft")
-            if (!target_pin) {
-                target_pin = L.marker([target_latitude,target_longitude]).addTo(map);
+
+            if (target_latitude != 0 && target_longitude != 0){
+                if (!target_pin) {
+                    target_pin = L.marker([target_latitude,target_longitude]).addTo(map);
+                }
+                
+                var marker = L.marker([target_latitude,target_longitude]).addTo(map);
+                marker.bindPopup(current_position_ground_elevation.toFixed(1) + " m").openPopup();
+                marker.on('contextmenu', function(e) {
+                    map.removeLayer(marker);
+                });
+                markers_array.push(marker);
+                
+                target_pin.setLatLng([target_latitude,target_longitude]).update();
+                target_pin.setZIndexOffset(1000);
+                
+                if (!sensor_pin) {
+                    sensor_pin = L.marker([lat,lon]).addTo(map);
+                }
+                sensor_pin.setLatLng([lat,lon]).update();
+        
+              //  if(target_latitude == 0 && target_longitude == 0)
+                    map.setView([lat,lon]);
+              //  else
+              //      map.fitBounds([[lat,lon],[target_latitude,target_longitude]]);
             }
-            target_pin.setLatLng([target_latitude,target_longitude]).update();
-            
-            if (!sensor_pin) {
-                sensor_pin = L.marker([lat,lon]).addTo(map);
-            }
-            sensor_pin.setLatLng([lat,lon]).update();
-    
-          //  if(target_latitude == 0 && target_longitude == 0)
-                map.setView([lat,lon]);
-          //  else
-	      //      map.fitBounds([[lat,lon],[target_latitude,target_longitude]]);
         }
     });
 }
@@ -311,6 +335,7 @@ function get_elevation(latlng) {
             marker.on('contextmenu', function(e) {
                 map.removeLayer(marker);
             });
+            markers_array.push(marker);
         }
     });
 }
