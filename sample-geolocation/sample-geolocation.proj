@@ -7,7 +7,7 @@
     <ProjectName>sample-geolocation</ProjectName>
     <IsRunnable>true</IsRunnable>
     <AndroidPermissions>android.permission.CAMERA;android.permission.VIBRATE;android.permission.ACCESS_COARSE_LOCATION;android.permission.ACCESS_FINE_LOCATION;android.permission.ACCESS_LOCATION_EXTRA_COMMANDS;android.permission.READ_PHONE_STATE;android.permission.INTERNET;android.permission.RECEIVE_SMS;android.permission.RECORD_AUDIO;android.permission.MODIFY_AUDIO_SETTINGS;android.permission.READ_CONTACTS;android.permission.WRITE_CONTACTS;android.permission.WRITE_EXTERNAL_STORAGE;android.permission.ACCESS_NETWORK_STATE</AndroidPermissions>
-    <DeviceOrientations>Portrait;Landscape</DeviceOrientations>
+    <DeviceOrientations>Portrait</DeviceOrientations>
     <iOSStatusBarStyle>Default</iOSStatusBarStyle>
     <BundleVersion>1.0</BundleVersion>
     <iOSDisplayName />
@@ -16,7 +16,7 @@
     <AndroidVersionCode>1</AndroidVersionCode>
     <AndroidHardwareAcceleration>false</AndroidHardwareAcceleration>
     <FrameworkVersion>3.2.0</FrameworkVersion>
-    <CorePlugins>org.apache.cordova.device-motion;org.apache.cordova.device-orientation;org.apache.cordova.geolocation;org.apache.cordova.splashscreen</CorePlugins>
+    <CorePlugins>org.apache.cordova.device-motion;org.apache.cordova.device-orientation;org.apache.cordova.geolocation;org.apache.cordova.inappbrowser;org.apache.cordova.splashscreen;org.apache.cordova.statusbar</CorePlugins>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Telerik\ICE\Tools\Mobile\MobileTools.targets" />
 </Project>

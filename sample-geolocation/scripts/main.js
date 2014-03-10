@@ -30,17 +30,19 @@ function onDeviceReady() {
 function initializeMap() {
 
 	checkConnection();
+
+//<a href="#" onclick="var ref = window.open('http://openstreetmap.org', '_blank');">OpenStreetMap</a>, under <a href="#" onclick="var ref = window.open('http://creativecommons.org/licenses/by-sa/3.0', '_blank');">CC BY SA</a>.'<a href="#">CC BY SA</a>.'
     
     var stamenUrl = 'http://b.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
-    var stamenAttrib = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.';
+	var stamenAttrib = 'Map tiles by <a href=\"#\" onclick=\"var ref = window.open(\'http://stamen.com\', \'_blank\');\">Stamen Design</a>, under <a href="#" onclick=\"var ref = window.open(\'http://creativecommons.org/licenses/by/3.0\', \'_blank\');\">CC BY 3.0</a>. Data by <a href="#" onclick="var ref = window.open(\'http://openstreetmap.org\', \'_blank\');">OpenStreetMap</a>, under <a href="#" onclick="var ref = window.open(\'http://creativecommons.org/licenses/by-sa/3.0\', \'_blank\');">CC BY SA</a>.';
     var stamen = new L.TileLayer(stamenUrl, { 
         								attribution: stamenAttrib,
         								detectRetina: true
                                       });
 
-    var googleStreets = new L.Google('ROADMAP');
-    var googleTerrain = new L.Google('TERRAIN');
-    var googleSatellite = new L.Google('HYBRID');
+    //var googleStreets = new L.Google('ROADMAP');
+    //var googleTerrain = new L.Google('TERRAIN');
+    //var googleSatellite = new L.Google('HYBRID');
    
    // var bingLayer = new L.BingLayer("Ap3GmA3YzgPeVI3iSZ8yZWepLOfmyR1zR89sMmDYQUUqWmbo0uZIw9kS3WhlR7gt");
     var BingLayer = L.TileLayer.extend({
@@ -71,7 +73,7 @@ function initializeMap() {
     
     var bingLayer = new BingLayer('http://t{s}.tiles.virtualearth.net/tiles/a{q}.jpeg?g=1398', {
         subdomains: ['0', '1', '2', '3', '4'],
-        attribution: '&copy; <a href="http://bing.com/maps">Bing Maps</a>'
+        attribution: '&copy; <a href="#" onclick=\"var ref = window.open(\'http://bing.com/maps\', \'_blank\');\">Bing Maps</a>'
     });
     
     map = new L.Map('map',{
@@ -269,9 +271,10 @@ function update_position(url, lat, lon) {
                 if (!target_pin) {
                     target_pin = L.marker([target_latitude,target_longitude]).addTo(map);
                 }
-                
-                var marker = L.marker([target_latitude,target_longitude]).addTo(map);
-                marker.bindPopup(current_position_ground_elevation.toFixed(1) + " m").openPopup();
+                    
+                var marker = L.marker([target_latitude,target_longitude], {icon: L.AwesomeMarkers.icon({icon: 'circle',  prefix: 'fa',markerColor: 'blue'}) }).addTo(map);
+               // var marker = L.marker([target_latitude,target_longitude]).addTo(map);
+                marker.bindPopup(target_elevation.toFixed(1) + " m").openPopup();
                 marker.on('contextmenu', function(e) {
                     map.removeLayer(marker);
                 });
@@ -284,6 +287,7 @@ function update_position(url, lat, lon) {
                     sensor_pin = L.marker([lat,lon]).addTo(map);
                 }
                 sensor_pin.setLatLng([lat,lon]).update();
+                target_pin.setZIndexOffset(999);
         
               //  if(target_latitude == 0 && target_longitude == 0)
                     map.setView([lat,lon]);
@@ -330,7 +334,8 @@ function get_elevation(latlng) {
                 .setLatLng(latlng)
                 .setContent(current_position_ground_elevation.toFixed(1) + " m")
                 .openOn(map);*/
-          	var marker = L.marker(latlng).addTo(map);
+            var marker = L.marker(latlng, {icon: L.AwesomeMarkers.icon({icon: 'circle',  prefix: 'fa',markerColor: 'orange'}) }).addTo(map);
+          	//var marker = L.marker(latlng).addTo(map);
       		marker.bindPopup(current_position_ground_elevation.toFixed(1) + " m").openPopup();
             marker.on('contextmenu', function(e) {
                 map.removeLayer(marker);
